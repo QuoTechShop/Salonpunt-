@@ -70,7 +70,7 @@ h1,h2,h3,h4{margin:0;letter-spacing:-.015em}
   opacity:0;pointer-events:none;transition:opacity .12s;z-index:50;
 }
 .rail button:hover::after{opacity:1}
-.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 
 /* ====== topbalk ====== */
 .top{
@@ -197,7 +197,8 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
 .staaf .waarde{font-size:13px;font-weight:700;min-width:62px;text-align:right}
 .weekbalk{display:flex;align-items:flex-end;gap:6px;height:120px;padding-top:8px}
 .weekbalk .kolom{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%;min-width:0}
-.weekbalk .staafje{background:var(--doen-zacht);border-top:3px solid var(--doen);border-radius:4px 4px 0 0;min-height:3px}
+.weekbalk .staafvak{flex:1;display:flex;align-items:flex-end;min-height:0}
+.weekbalk .staafje{width:100%;background:var(--doen-zacht);border-top:3px solid var(--doen);border-radius:4px 4px 0 0;min-height:3px}
 .weekbalk .kolom.uit .staafje{background:var(--bg);border-top-color:var(--line-2)}
 .weekbalk .lab{font-size:10.5px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden}
 
@@ -407,6 +408,54 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
   .ag-balk,.ag-legenda,.zoekbalk{padding:9px 14px}
   .kop h1{font-size:19px}
   .verberg-klein{display:none !important}
+
+  /* kopbalk op één rij */
+  .top{padding:8px 14px;flex-wrap:nowrap}
+  .zaak span span{display:none}
+  .zaak b{font-size:14px}
+  .kies{font-size:12px;padding:6px 8px;max-width:46%;text-overflow:ellipsis}
+
+  /* tabbalk: leesbare labels */
+  .rail button span{font-size:10px;text-transform:none;letter-spacing:0;font-weight:600}
+
+  /* kerncijfers: twee naast elkaar, compact */
+  .cijfers{grid-template-columns:1fr 1fr}
+  .cijfer{padding:11px 13px}
+  .cijfer .lbl{font-size:9.5px;letter-spacing:.07em}
+  .cijfer .getal{font-size:21px}
+  .cijfer .bij{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* agendabalk: twee rijen, toevoegen als zwevende knop */
+  .ag-balk{display:grid;grid-template-columns:auto 1fr auto;gap:8px 10px;padding:8px 14px}
+  .ag-nav{order:1}
+  .ag-titel{order:2;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #agVandaag{order:3}
+  .ag-balk .groep{order:4}
+  .ag-balk .uit:has(#agWiePop){order:5;grid-column:2/4;justify-self:start}
+  .ag-balk .uit:has(#agViewPop),.ag-balk .duw{display:none}
+  #agNieuw{
+    position:fixed;right:16px;bottom:72px;z-index:40;width:56px;height:56px;padding:0;
+    border-radius:999px;justify-content:center;font-size:0;box-shadow:0 6px 18px rgb(0 0 0 / .25);
+  }
+  #agNieuw svg{width:26px;height:26px}
+
+  /* klanten en behandelingen: geen brede tabellen */
+  .tab.beh thead{display:none}
+  .tab.beh tr{
+    display:grid;grid-template-columns:1fr auto auto;grid-template-areas:"naam naam weg" "groep duur prijs";
+    gap:6px 10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);
+  }
+  .tab.beh td{display:block;padding:0;border:0}
+  .tab.beh td:nth-child(1){grid-area:naam}
+  .tab.beh td:nth-child(2){grid-area:groep}
+  .tab.beh td:nth-child(3){grid-area:duur}
+  .tab.beh td:nth-child(4){grid-area:prijs}
+  .tab.beh td:nth-child(6){grid-area:weg}
+  .tab select{padding:5px 4px;font-size:12px}
+
+  /* paneelknoppen op vingerhoogte */
+  .paneel-voet{padding:10px 14px}
+  .paneel-voet .knop{flex:1 1 calc(50% - 8px);min-height:44px;justify-content:center}
 }
 </style>
 </head>
@@ -417,7 +466,7 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
   <nav class="rail" id="rail" aria-label="Hoofdmenu">
     <div class="merk" id="railMerk" aria-hidden="true">SV</div>
     <button data-naar="vandaag" aria-current="page" data-tip="Vandaag">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5 6 4-13 2.5 7h5"/></svg>
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/><text id="railDag" x="12" y="19" text-anchor="middle" font-size="8.5" font-weight="800" fill="currentColor" stroke="none" font-family="inherit">14</text></svg>
       <span>Vandaag</span>
     </button>
     <button data-naar="agenda" data-tip="Agenda">
@@ -548,7 +597,7 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
             <table class="tab"><thead><tr>
               <th>Klant</th><th class="verberg-klein">Vaste medewerker</th>
               <th class="verberg-klein">Laatst geweest</th><th>Volgende</th>
-              <th class="r verberg-klein">Bezoeken</th><th class="r">Besteed</th>
+              <th class="r verberg-klein">Bezoeken</th><th class="r verberg-klein">Besteed</th>
             </tr></thead><tbody id="klLijst"></tbody></table>
           </div>
         </div>
@@ -620,7 +669,7 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
             <div class="duw"></div>
             <button class="knop klein" id="inNieuweBeh">Behandeling toevoegen</button>
           </div>
-          <table class="tab"><thead><tr>
+          <table class="tab beh"><thead><tr>
             <th>Behandeling</th><th>Groep</th><th class="r">Duur</th><th class="r">Prijs</th><th class="r verberg-klein">Per uur</th><th></th>
           </tr></thead><tbody id="inBeh"></tbody></table>
         </div>
@@ -935,6 +984,11 @@ function bouw(V) {
     });
   }
 
+  /* drukte per week: de ene week loopt beter dan de andere, anders is de
+     weekgrafiek een rij even hoge balken */
+  var drukte = [];
+  for (var w = 0; w < 14; w++) drukte.push(0.6 + rand() * 0.4);
+
   klanten.forEach(function (kl) {
     var d = -91 + Math.floor(rand() * kl.ritme * 7);
     var voorkeur = [];
@@ -951,7 +1005,7 @@ function bouw(V) {
         if (v.length) kandidaten = v;
       }
       var uren = V.open[dag(d).getDay()];
-      if (uren && kandidaten.length) {
+      if (uren && kandidaten.length && (d >= 0 || rand() < drukte[Math.floor((d + 91) / 7)])) {
         var m2 = pak(kandidaten), geplaatst = false;
         for (var poging = 0; poging < 14 && !geplaatst; poging++) {
           var van = min(uren[0]) + Math.floor(rand() * ((min(uren[1]) - min(uren[0]) - beh.min) / 15)) * 15;
@@ -1581,6 +1635,11 @@ function bewaarNieuw() {
    Klantenbestand
    Dit is wat de eigenaar nu in een schriftje heeft staan.
    ============================================================ */
+// eerste letter van voor- en achternaam: "Bas van Dijk" -> BD
+function initialen(naam) {
+  var w = naam.trim().split(/\s+/);
+  return (w[0].slice(0, 1) + (w.length > 1 ? w[w.length - 1].slice(0, 1) : '')).toUpperCase();
+}
 function vanKlant(kl) { return VAK.perKlant[kl.id] || []; }
 function bezoekenVan(kl) {
   return vanKlant(kl).filter(function (a) { return a.d < 0 && a.status !== 'af'; })
@@ -1626,7 +1685,7 @@ function tekenKlanten() {
     var kl = x.kl, c = x.c, vast = kl.vast ? VAK.mwVan[kl.vast] : null;
     return '<tr data-kb="' + kl.id + '">' +
       '<td><span class="rij-mens"><span class="av" style="background:var(--c-' +
-        (vast ? vast.kleur : 'blauw') + ')">' + esc(kl.naam.slice(0, 1) + (kl.naam.split(' ')[1] || ' ').slice(0, 1)) + '</span>' +
+        (vast ? vast.kleur : 'blauw') + ')">' + esc(initialen(kl.naam)) + '</span>' +
         '<span style="min-width:0"><b>' + esc(kl.naam) + '</b>' +
         '<span style="display:block;font-size:11.5px;color:var(--muted)">' + esc(kl.tel) + '</span></span></span></td>' +
       '<td class="verberg-klein stil">' + (vast ? esc(vast.naam) : 'geen voorkeur') + '</td>' +
@@ -1636,7 +1695,7 @@ function tekenKlanten() {
         : c.tijdVoor ? '<span class="vlag nieuw">tijd voor een afspraak</span>'
         : '<span class="stil">—</span>') + '</td>' +
       '<td class="r verberg-klein">' + c.bezoeken + (c.weg ? ' <span class="vlag weg">' + c.weg + '×weg</span>' : '') + '</td>' +
-      '<td class="r"><b>' + euro(c.besteed) + '</b></td></tr>';
+      '<td class="r verberg-klein"><b>' + euro(c.besteed) + '</b></td></tr>';
   }).join('') + (rest ? '<tr><td colspan="6" style="padding:16px;text-align:center;color:var(--muted);font-size:12.5px">' +
     'en nog ' + rest + ' klanten — zoek op naam of gebruik een filter</td></tr>' : '') ||
     '<tr><td colspan="6" style="padding:30px;text-align:center;color:var(--muted)">Niets gevonden.</td></tr>';
@@ -1819,7 +1878,7 @@ function tekenWeken() {
   var top = Math.max.apply(null, weken.map(function (x) { return x.som; })) || 1;
   $('omWeken').innerHTML = weken.map(function (x, i) {
     return '<div class="kolom' + (i < 11 ? '' : ' uit') + '" title="' + esc(x.lab + ': ' + euro(x.som)) + '">' +
-      '<div class="staafje" style="height:' + Math.max(3, Math.round(x.som / top * 100)) + '%"></div>' +
+      '<div class="staafvak"><div class="staafje" style="height:' + Math.max(3, Math.round(x.som / top * 100)) + '%"></div></div>' +
       '<span class="lab">' + esc(x.lab) + '</span></div>';
   }).join('');
 }
@@ -2455,7 +2514,11 @@ document.addEventListener('keydown', function (e) {
   else if ($('paneel').hasAttribute('data-open')) sluitPaneel();
 });
 
+$('railDag').textContent = new Date().getDate();   // dag van vandaag in het kalender-icoon
 zetVak(VAKKEN[0].id);
+// ?scherm=agenda opent direct dat scherm (handig voor de mockup-pagina)
+var startScherm = new URLSearchParams(location.search).get('scherm');
+if (startScherm && SCHERMEN[startScherm]) naar(startScherm);
 
 </script>
 </body>
