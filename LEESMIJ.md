@@ -62,7 +62,7 @@ Claude schrijft de gewijzigde bestanden in deze map. Jij:
 2. **Commit to main**.
 3. **Push origin**.
 
-Binnen een paar seconden staat het live.
+Binnen een paar seconden staat het live — de webhook is ingesteld op 14 september 2026.
 
 ## Als het niet werkt
 
