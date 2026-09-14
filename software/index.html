@@ -42,7 +42,7 @@ h1,h2,h3,h4{margin:0;letter-spacing:-.015em}
 :focus-visible{outline:2px solid var(--doen);outline-offset:2px}
 
 /* ====== raamwerk ====== */
-.app{display:flex;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh;height:100dvh;overflow:hidden}
 .rail{
   width:56px;flex:none;background:var(--rail);display:flex;flex-direction:column;
   align-items:center;padding:10px 0;gap:3px;
@@ -413,7 +413,9 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
   .top{padding:8px 14px;flex-wrap:nowrap}
   .zaak span span{display:none}
   .zaak b{font-size:14px}
-  .kies{font-size:12px;padding:6px 8px;max-width:46%;text-overflow:ellipsis}
+  /* 16px: kleiner en de telefoon zoomt in bij het kiezen, en zoomt niet terug */
+  .kies{font-size:16px;padding:6px 8px;max-width:46%;text-overflow:ellipsis}
+  .inv,.tab select,.paneel input,.paneel select,.paneel textarea,.venster input,.venster select,.venster textarea{font-size:16px}
 
   /* tabbalk: leesbare labels */
   .rail button span{font-size:10px;text-transform:none;letter-spacing:0;font-weight:600}
@@ -451,7 +453,7 @@ textarea.inv{resize:vertical;min-height:70px;line-height:1.5}
   .tab.beh td:nth-child(3){grid-area:duur}
   .tab.beh td:nth-child(4){grid-area:prijs}
   .tab.beh td:nth-child(6){grid-area:weg}
-  .tab select{padding:5px 4px;font-size:12px}
+  .tab select{padding:5px 4px}
 
   /* paneelknoppen op vingerhoogte */
   .paneel-voet{padding:10px 14px}
@@ -1419,7 +1421,9 @@ function blokHtml(a, botst, y) {
 
 /* Op de telefoon is een tijdraster onleesbaar: dan een lijst op tijd. */
 function tekenAgLijst() {
-  var lijst = opDag(staat.dag).filter(zichtbaar).sort(function (x, y) { return x.van - y.van; });
+  var lijst = opDag(staat.dag).filter(zichtbaar)
+    .filter(function (a) { return !staat.kolomUit[a.mwId]; })   // zelfde medewerkerkeuze als de kolommen
+    .sort(function (x, y) { return x.van - y.van; });
   if (!lijst.length) {
     $('agLijst').innerHTML = '<p style="color:var(--muted)">Geen afspraken op deze dag.</p>';
     return;
